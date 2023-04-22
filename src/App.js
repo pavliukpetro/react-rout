@@ -1,25 +1,44 @@
-import logo from './logo.svg';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import Homepage from './pages/Homepage';
+import Products from './pages/Products';
+import Root from './pages/Root';
+import Error from './pages/Error';
+import ProductDetails from './pages/ProductDetails';
+
 import './App.css';
 
+const routers = createBrowserRouter([
+    {
+        path: '/',
+        element: <Root />,
+        errorElement: <Error />,
+        children: [
+            {
+                path: '/', element: <Homepage />
+            },
+            {
+                path: '/products',
+                element: <Products />,
+                loader: async () => {
+                    const response = await fetch('https://dummyjson.com/products');
+                    const { products } = await response.json();
+
+                    console.log('loader');
+
+                    return products;
+                }
+            },
+            {
+                path: '/products/:productId', element: <ProductDetails />
+            }
+        ]
+    }
+]);
+
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    return (
+        <RouterProvider router={routers} />
+    );
 }
 
 export default App;
